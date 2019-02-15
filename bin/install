@@ -9,9 +9,15 @@ install () {
   local native_filename=""
   local github_prefix="https://github.com/JetBrains/kotlin/releases"
 
-  [ "Linux" = "$(uname)" ] && platform="linux" || platform="darwin"
-  [ "linux" = "${platform}" ] && tempdir=$(mktemp -d asdf-kotlin.XXXX) || tempdir=$(mktemp -dt asdf-kotlin)
+  [ "Linux"  = "$(uname)" ] && platform="linux"
+  [ "Darwin" = "$(uname)" ] && platform="darwin"
 
+  tempdir=$(mktemp -d asdf-kotlin.XXXX)  # Try GNU mktemp first
+  if [ ! $? ]; then  # Fall back to BSD mktemp
+      tempdir=$(mktemp -dt asdf-kotlin)
+  fi
+
+  echo platform:$platform
   curl -L "${github_prefix}/download/v${version}/kotlin-compiler-${version}.zip" -o "${tempdir}/kotlin-compiler.zip"
   unzip -qq "${tempdir}/kotlin-compiler.zip" -d "${install_path}"
 
